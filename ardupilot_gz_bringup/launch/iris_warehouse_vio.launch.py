@@ -52,7 +52,7 @@ def generate_launch_description():
     pkg_project_gazebo = get_package_share_directory("ardupilot_gz_gazebo")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
 
-    # Iris.
+    # Iris with VIO (stereo cameras).
     iris = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -61,17 +61,17 @@ def generate_launch_description():
                         FindPackageShare("ardupilot_gz_bringup"),
                         "launch",
                         "robots",
-                        "iris_lidar.launch.py",
+                        "iris_vio.launch.py",
                     ]
                 ),
             ]
         ),
         launch_arguments={
-            "model": "iris_with_lidar",
+            "model": "iris_with_stereo_camera",
             "name": "iris",
             "x": "0",
             "y": "0",
-            "z": "0.194923",
+            "z": "0.195",
             "R": "0.0",
             "P": "0.0",
         }.items(),
@@ -84,7 +84,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "gz_args": "-v4 -s -r "
-            + f'{Path(pkg_project_gazebo) / "worlds" / "iris_maze.sdf"}'
+            + f'{Path(pkg_project_gazebo) / "worlds" / "iris_warehouse_vio.sdf"}'
         }.items(),
     )
 
@@ -101,7 +101,7 @@ def generate_launch_description():
         executable="rviz2",
         arguments=[
             "-d",
-            f'{Path(pkg_project_bringup) / "rviz" / "iris_with_lidar.rviz"}',
+            f'{Path(pkg_project_bringup) / "rviz" / "iris.rviz"}',
         ],
         condition=IfCondition(LaunchConfiguration("rviz")),
     )
@@ -114,6 +114,7 @@ def generate_launch_description():
             gz_sim_server,
             gz_sim_gui,
             iris,
-            # rviz,
+            rviz,
         ]
     )
+

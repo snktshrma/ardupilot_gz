@@ -71,7 +71,7 @@ def generate_launch_description():
             "name": "iris",
             "x": "0",
             "y": "0",
-            "z": "0.194923",
+            "z": "0.195",
             "R": "0.0",
             "P": "0.0",
         }.items(),
