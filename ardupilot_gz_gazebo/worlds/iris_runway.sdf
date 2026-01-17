@@ -75,8 +75,107 @@
     <include>
       <uri>model://iris_with_gimbal</uri>
       <name>iris</name>
-      <pose degrees="true">0 0 0.195 0 0 90</pose>
+      <pose degrees="true">150 0 0.2 0 0 90</pose>
     </include>
+
+    <!-- TERRAIN -->
+    <model name="mars_terrain">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>mars_heightmap_from_texture.png</uri>
+              <size>200 200 5</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
+              <uri>mars_heightmap_from_texture.png</uri>
+              <size>200 200 5</size>
+              <pos>0 0 0</pos>
+              <texture>
+                <diffuse>image.jpg</diffuse>
+                <normal>image.jpg</normal>
+                <size>200</size>
+              </texture>
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  
+
+    <!-- WATER PATCH -->
+    <model name="water_patch_1">
+      <static>true</static>
+      <pose>-20 10 3 0 0 0</pose>
+      <link name="link">
+        <visual name="water">
+          <geometry>
+            <box>
+              <size>10 8 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.4 0.7 0.8</ambient>
+            <diffuse>0.1 0.5 0.8 0.8</diffuse>
+            <specular>0.3 0.3 0.3 0.5</specular>
+            <emissive>0 0.05 0.08 0.15</emissive>
+          </material>
+          <transparency>0.35</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+     <model name="water_patch_2">
+      <static>true</static>
+      <pose>-40 54 3 0 0 0</pose>
+      <link name="link">
+        <visual name="water">
+          <geometry>
+            <box>
+              <size>10 8 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.4 0.7 0.8</ambient>
+            <diffuse>0.1 0.5 0.8 0.8</diffuse>
+            <specular>0.3 0.3 0.3 0.5</specular>
+            <emissive>0 0.05 0.08 0.15</emissive>
+          </material>
+          <transparency>0.35</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+     <model name="water_patch_3">
+      <static>true</static>
+      <pose>67 80 3 0 0 0</pose>
+      <link name="link">
+        <visual name="water">
+          <geometry>
+            <box>
+              <size>10 8 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.4 0.7 0.8</ambient>
+            <diffuse>0.1 0.5 0.8 0.8</diffuse>
+            <specular>0.3 0.3 0.3 0.5</specular>
+            <emissive>0 0.05 0.08 0.15</emissive>
+          </material>
+          <transparency>0.35</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
 
   </world>
 </sdf>
