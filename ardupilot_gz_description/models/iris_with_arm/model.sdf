@@ -1,4 +1,4 @@
-<?xml version='1.0'?>
+<?xml version="1.0"?>
 <sdf version="1.9">
 
   <model name="iris_with_arm">
@@ -283,8 +283,8 @@
     </plugin>
 
     <!-- ARM SECTION - OPTIMIZED FOR PERFORMANCE -->
-    <link name='arm_base_link'>
-      <pose relative_to='arm_base_joint'>0 0 0 3.14159 0 0</pose>
+    <link name="arm_base_link">
+      <pose relative_to="arm_base_joint">0 0 0 3.14159 0 0</pose>
       <self_collide>0</self_collide>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -298,7 +298,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='arm_base_link_collision'>
+      <collision name="arm_base_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
@@ -307,22 +307,28 @@
           </cylinder>
         </geometry>
       </collision>
-      <visual name='arm_base_link_visual'>
+      <visual name="arm_base_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.03</radius><length>0.06</length>
           </cylinder>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='camera_base_joint' type='fixed'>
-      <pose relative_to='arm_base_link'>0 0 0.03 0 0 0</pose>
-      <parent>arm_base_link</parent>
-      <child>camera_link</child>
+    <joint name="arm_base_joint" type="fixed">
+      <pose relative_to="base_link">0 0 -0.05 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>arm_base_link</child>
     </joint>
-    <link name='camera_link'>
-      <pose relative_to='camera_base_joint'>0 0 0 0 0 0</pose>
+
+    <link name="camera_link">
+      <pose relative_to="camera_base_joint">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.0001</mass>
@@ -335,15 +341,20 @@
           <izz>0.00001</izz>
         </inertia>
       </inertial>
-      <visual name='camera_link_visual'>
+      <visual name="camera_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.02 0.03 0.02</size>
           </box>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
-      <sensor name='camera_base' type='camera'>
+      <sensor name="camera_base" type="camera">
         <camera>
           <horizontal_fov>1.0472</horizontal_fov>
           <image>
@@ -359,27 +370,15 @@
         <update_rate>10</update_rate>
       </sensor>
     </link>
-    <joint name='shoulder_pan' type='revolute'>
-      <pose relative_to='arm_base_link'>0 0 0.058999999999999997 0 0 0</pose>
+    <joint name="camera_base_joint" type="fixed">
+      <pose relative_to="arm_base_link">0 0 0.03 0 0 0</pose>
       <parent>arm_base_link</parent>
-      <child>shoulder_link</child>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>5.0</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
+      <child>camera_link</child>
     </joint>
-    <link name='shoulder_link'>
+
+    <link name="shoulder_link">
       <self_collide>0</self_collide>
-      <pose relative_to='shoulder_pan'>0 0 0 0 0 0</pose>
+      <pose relative_to="shoulder_pan">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -392,7 +391,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='shoulder_link_collision'>
+      <collision name="shoulder_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -400,7 +399,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='shoulder_link_visual'>
+      <visual name="shoulder_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -408,29 +407,32 @@
             <uri>meshes/shoulder.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='shoulder_lift' type='revolute'>
-      <pose relative_to='shoulder_link'>-0.01 0 0.028000000000000001 0 0 0</pose>
-      <parent>shoulder_link</parent>
-      <child>humerus_link</child>
+    <joint name="shoulder_pan" type="revolute">
+      <pose relative_to="arm_base_link">0 0 0.059 0 0 0</pose>
+      <parent>arm_base_link</parent>
+      <child>shoulder_link</child>
       <axis>
-        <xyz>0 1 0</xyz>
+        <xyz>0 0 1</xyz>
         <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='humerus_link'>
+
+    <link name="humerus_link">
       <self_collide>0</self_collide>
-      <pose relative_to='shoulder_lift'>0 0 0 0 0 0</pose>
+      <pose relative_to="shoulder_lift">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -443,7 +445,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='humerus_link_collision'>
+      <collision name="humerus_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
@@ -451,7 +453,7 @@
           </cylinder>
         </geometry>
       </collision>
-      <visual name='humerus_link_visual'>
+      <visual name="humerus_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -459,30 +461,32 @@
             <uri>meshes/humerus.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='elbow' type='revolute'>
-      <pose relative_to='humerus_link'>0 0 0.105 0 0 0</pose>
-      <parent>humerus_link</parent>
-      <child>forearm_link</child>
+    <joint name="shoulder_lift" type="revolute">
+      <pose relative_to="shoulder_link" degrees="true">-0.01 0 0.028 0 90 0</pose>
+      <parent>shoulder_link</parent>
+      <child>humerus_link</child>
       <axis>
-        <xyz>0 -1 0</xyz>
-        <initial_position>-0.785</initial_position>
+        <xyz>0 1 0</xyz>
         <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <lower>-3.142</lower>
+          <upper>0.0</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='forearm_link'>
+
+    <link name="forearm_link">
       <self_collide>0</self_collide>
-      <pose relative_to='elbow'>0 0 0 0 0 0</pose>
+      <pose relative_to="elbow">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -495,7 +499,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='forearm_link_collision'>
+      <collision name="forearm_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
@@ -503,7 +507,7 @@
           </cylinder>
         </geometry>
       </collision>
-      <visual name='forearm_link_visual'>
+      <visual name="forearm_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -511,29 +515,32 @@
             <uri>meshes/forearm.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='wrist_flex' type='revolute'>
-      <pose relative_to='forearm_link'>0 0 0.089999999999999997 0 0 0</pose>
-      <parent>forearm_link</parent>
-      <child>wrist_link</child>
+    <joint name="elbow" type="revolute">
+      <pose relative_to="humerus_link">0 0 0.105 0 0 0</pose>
+      <parent>humerus_link</parent>
+      <child>forearm_link</child>
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.04</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='wrist_link'>
+
+    <link name="wrist_link">
       <self_collide>0</self_collide>
-      <pose relative_to='wrist_flex'>0 0 0 0 0 0</pose>
+      <pose relative_to="wrist_flex">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -546,7 +553,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='wrist_link_collision'>
+      <collision name="wrist_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -554,7 +561,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='wrist_link_visual'>
+      <visual name="wrist_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -562,29 +569,32 @@
             <uri>meshes/wrist.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='wrist_roll' type='revolute'>
-      <pose relative_to='wrist_link'>0 0 0.059999999999999998 0 0 0</pose>
-      <parent>wrist_link</parent>
-      <child>hand_link</child>
+    <joint name="wrist_flex" type="revolute">
+      <pose relative_to="forearm_link">0 0 0.09 0 0 0</pose>
+      <parent>forearm_link</parent>
+      <child>wrist_link</child>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.04</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='hand_link'>
+
+    <link name="hand_link">
       <self_collide>0</self_collide>
-      <pose relative_to='wrist_roll'>0 0 0 0 0 0</pose>
+      <pose relative_to="wrist_roll">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -597,7 +607,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='hand_link_collision'>
+      <collision name="hand_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -605,7 +615,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='hand_link_visual'>
+      <visual name="hand_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -613,15 +623,31 @@
             <uri>meshes/hand.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='camera_wrist_joint' type='fixed'>
-      <pose relative_to='hand_link'>0 0.02 0 0 0 0</pose>
-      <parent>hand_link</parent>
-      <child>camera_wrist_link</child>
+    <joint name="wrist_roll" type="revolute">
+      <pose relative_to="wrist_link">0 0 0.06 0 0 0</pose>
+      <parent>wrist_link</parent>
+      <child>hand_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+        </limit>
+        <dynamics>
+          <damping>0.04</damping>
+        </dynamics>
+      </axis>
     </joint>
-    <link name='camera_wrist_link'>
-      <pose relative_to='camera_wrist_joint'>0 0 0 0 0 0</pose>
+
+    <link name="camera_wrist_link">
+      <pose relative_to="camera_wrist_joint">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.0001</mass>
@@ -634,15 +660,20 @@
           <izz>0.00001</izz>
         </inertia>
       </inertial>
-      <visual name='camera_wrist_link_visual'>
+      <visual name="camera_wrist_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.02 0.03 0.02</size>
           </box>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
-      <sensor name='camera_wrist' type='camera'>
+      <sensor name="camera_wrist" type="camera">
         <camera>
           <horizontal_fov>1.0472</horizontal_fov>
           <image>
@@ -658,27 +689,15 @@
         <update_rate>10</update_rate>
       </sensor>
     </link>
-    <joint name='grip_left' type='revolute'>
-      <pose relative_to='hand_link'>0 0.014999999999999999 0.029999999999999999 -1.5700000000000001 0 0</pose>
+    <joint name="camera_wrist_joint" type="fixed">
+      <pose relative_to="hand_link">0 0.02 0 0 0 0</pose>
       <parent>hand_link</parent>
-      <child>grip_left_link</child>
-      <axis>
-        <xyz>-1 0 0</xyz>
-        <limit>
-          <lower>-1.5700000000000001</lower>
-          <upper>0</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
+      <child>camera_wrist_link</child>
     </joint>
-    <link name='grip_left_link'>
+
+    <link name="grip_left_link">
       <self_collide>0</self_collide>
-      <pose relative_to='grip_left'>0 0 0 0 0 0</pose>
+      <pose relative_to="grip_left">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -691,7 +710,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='grip_left_link_collision'>
+      <collision name="grip_left_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -699,7 +718,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='grip_left_link_visual'>
+      <visual name="grip_left_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -707,34 +726,32 @@
             <uri>meshes/carpal-left.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='finger_left' type='revolute'>
-      <pose relative_to='grip_left_link'>0 0 0.029999999999999999 1.5700000000000001 0 0</pose>
-      <parent>grip_left_link</parent>
-      <child>finger_left_link</child>
+    <joint name="grip_left" type="revolute">
+      <pose relative_to="hand_link">0 0.015 0.03 -1.57 0 0</pose>
+      <parent>hand_link</parent>
+      <child>grip_left_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <mimic joint='grip_left'>
-          <multiplier>-1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic>
         <limit>
-          <lower>-1.5700000000000001</lower>
+          <lower>-1.57</lower>
           <upper>0</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='finger_left_link'>
+
+    <link name="finger_left_link">
       <self_collide>0</self_collide>
-      <pose relative_to='finger_left'>0 0 0 0 0 0</pose>
+      <pose relative_to="finger_left">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -747,7 +764,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='finger_left_link_collision'>
+      <collision name="finger_left_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -755,7 +772,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='finger_left_link_visual'>
+      <visual name="finger_left_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -763,34 +780,39 @@
             <uri>meshes/finger.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='grip_right' type='revolute'>
-      <pose relative_to='hand_link'>0 -0.014999999999999999 0.029999999999999999 1.5700000000000001 0 0</pose>
-      <parent>hand_link</parent>
-      <child>grip_right_link</child>
+    <joint name="finger_left" type="revolute">
+      <pose relative_to="grip_left_link">0 0 0.03 1.57 0 0</pose>
+      <parent>grip_left_link</parent>
+      <child>finger_left_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <mimic joint='grip_left'>
+        <!-- <mimic joint="grip_left">
           <multiplier>-1</multiplier>
           <offset>0</offset>
           <reference>0</reference>
-        </mimic>
+        </mimic> -->
         <limit>
+          <!-- <lower>-1.57</lower>
+          <upper>0</upper> -->
           <lower>0</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <upper>0</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='grip_right_link'>
+
+    <link name="grip_right_link">
       <self_collide>0</self_collide>
-      <pose relative_to='grip_right'>0 0 0 0 0 0</pose>
+      <pose relative_to="grip_right">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -803,7 +825,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='grip_right_link_collision'>
+      <collision name="grip_right_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -811,7 +833,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='grip_right_link_visual'>
+      <visual name="grip_right_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -819,34 +841,37 @@
             <uri>meshes/carpal-right.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='finger_right' type='revolute'>
-      <pose relative_to='grip_right_link'>0 0 0.029999999999999999 -1.5700000000000001 0 0</pose>
-      <parent>grip_right_link</parent>
-      <child>finger_right_link</child>
+    <joint name="grip_right" type="revolute">
+      <pose relative_to="hand_link">0 -0.015 0.03 1.57 0 0</pose>
+      <parent>hand_link</parent>
+      <child>grip_right_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <mimic joint='grip_left'>
-          <multiplier>1</multiplier>
+        <!-- <mimic joint="grip_left">
+          <multiplier>-1</multiplier>
           <offset>0</offset>
           <reference>0</reference>
-        </mimic>
+        </mimic> -->
         <limit>
           <lower>0</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <upper>1.57</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='finger_right_link'>
+
+    <link name="finger_right_link">
       <self_collide>0</self_collide>
-      <pose relative_to='finger_right'>0 0 0 0 0 0</pose>
+      <pose relative_to="finger_right">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -859,7 +884,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='finger_right_link_collision'>
+      <collision name="finger_right_link_collision">
         <pose>0 0 0 0 0 3.1415899999999999</pose>
         <geometry>
           <box>
@@ -867,7 +892,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='finger_right_link_visual'>
+      <visual name="finger_right_link_visual">
         <pose>0 0 0 0 0 3.1415899999999999</pose>
         <geometry>
           <mesh>
@@ -875,34 +900,100 @@
             <uri>meshes/finger.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='tendon_left' type='revolute'>
-      <pose relative_to='hand_link'>0 0.0050000000000000001 0.050000000000000003 -1.5700000000000001 0 0</pose>
+    <joint name="finger_right" type="revolute">
+      <pose relative_to="grip_right_link">0 0 0.03 -1.57 0 0</pose>
+      <parent>grip_right_link</parent>
+      <child>finger_right_link</child>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <!-- <mimic joint="grip_left">
+          <multiplier>1</multiplier>
+          <offset>0</offset>
+          <reference>0</reference>
+        </mimic> -->
+        <limit>
+          <!-- <lower>0</lower>
+          <upper>1.57</upper> -->
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <link name="tendon_left_link">
+      <self_collide>0</self_collide>
+      <pose relative_to="tendon_left">0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <collision name="tendon_left_link_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="tendon_left_link_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/tendon.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
+      </visual>
+    </link>
+    <joint name="tendon_left" type="revolute">
+      <pose relative_to="hand_link">0 0.005 0.05 -1.57 0 0</pose>
       <parent>hand_link</parent>
       <child>tendon_left_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <mimic joint='grip_left'>
+        <!-- <mimic joint="grip_left">
           <multiplier>1</multiplier>
           <offset>0</offset>
           <reference>0</reference>
-        </mimic>
+        </mimic> -->
         <limit>
-          <lower>-1.5700000000000001</lower>
+          <!-- <lower>-1.57</lower>
+          <upper>0</upper> -->
+          <lower>0</lower>
           <upper>0</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='tendon_left_link'>
+
+    <link name="tendon_right_link">
       <self_collide>0</self_collide>
-      <pose relative_to='tendon_left'>0 0 0 0 0 0</pose>
+      <pose relative_to="tendon_right">0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
@@ -915,7 +1006,7 @@
           <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <collision name='tendon_left_link_collision'>
+      <collision name="tendon_right_link_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
@@ -923,7 +1014,7 @@
           </box>
         </geometry>
       </collision>
-      <visual name='tendon_left_link_visual'>
+      <visual name="tendon_right_link_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -931,64 +1022,36 @@
             <uri>meshes/tendon.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
       </visual>
     </link>
-    <joint name='tendon_right' type='revolute'>
-      <pose relative_to='hand_link'>0 -0.0050000000000000001 0.050000000000000003 1.5700000000000001 0 0</pose>
+    <joint name="tendon_right" type="revolute">
+      <pose relative_to="hand_link">0 -0.005 0.05 1.57 0 0</pose>
       <parent>hand_link</parent>
       <child>tendon_right_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <mimic joint='grip_left'>
+        <!-- <mimic joint="grip_left">
           <multiplier>-1</multiplier>
           <offset>0</offset>
           <reference>0</reference>
-        </mimic>
+        </mimic> -->
         <limit>
+          <!-- <lower>0</lower>
+          <upper>1.57</upper> -->
           <lower>0</lower>
-          <upper>1.5700000000000001</upper>
-          <effort>1000</effort>
-          <velocity>2.0</velocity>
+          <upper>0</upper>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
-    <link name='tendon_right_link'>
-      <self_collide>0</self_collide>
-      <pose relative_to='tendon_right'>0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.001</mass>
-        <inertia>
-          <ixx>0.000001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000001</iyy>
-          <iyz>0</iyz>
-          <izz>0.000001</izz>
-        </inertia>
-      </inertial>
-      <collision name='tendon_right_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.01 0.01 0.05</size>
-          </box>
-        </geometry>
-      </collision>
-      <visual name='tendon_right_link_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>meshes/tendon.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
+
     <plugin filename="gz-sim-joint-state-publisher-system"
       name="gz::sim::systems::JointStatePublisher">
     </plugin>
@@ -997,151 +1060,156 @@
         name="gz::sim::systems::JointPositionController">
       <joint_name>shoulder_pan</joint_name>
       <topic>/shoulder_pan/cmd_pos</topic>
-      <p_gain>100</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>10</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>10</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>10000</cmd_max>
+      <cmd_min>-10000</cmd_min>
     </plugin>
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>shoulder_lift</joint_name>
       <topic>/shoulder_lift/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>-0.3</initial_position>
+      <p_gain>10</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>10000</cmd_max>
+      <cmd_min>-10000</cmd_min>
     </plugin>
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>elbow</joint_name>
       <topic>/elbow/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>-1.57</initial_position>
+      <p_gain>10</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>10000</cmd_max>
+      <cmd_min>-10000</cmd_min>
     </plugin>
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>wrist_flex</joint_name>
       <topic>/wrist_flex/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>1.57</initial_position>
+      <p_gain>10</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>10000</cmd_max>
+      <cmd_min>-10000</cmd_min>
     </plugin>
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>wrist_roll</joint_name>
       <topic>/wrist_roll/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>5</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>3.14</cmd_max>
-      <cmd_min>-3.14</cmd_min>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
     </plugin>
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>grip_left</joint_name>
       <topic>/grip_left/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>0</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
     </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
+    <!-- <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>finger_left</joint_name>
       <topic>/finger_left/cmd_pos</topic>
-      <p_gain>50</p_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
       <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <d_gain>0.1</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
-    </plugin>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
+    </plugin> -->
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>grip_right</joint_name>
       <topic>/grip_right/cmd_pos</topic>
-      <p_gain>50</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>0</cmd_max>
-      <cmd_min>-1.57</cmd_min>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
     </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
+    <!-- <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>finger_right</joint_name>
       <topic>/finger_right/cmd_pos</topic>
-      <p_gain>50</p_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
       <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <d_gain>0.1</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
-    </plugin>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
+    </plugin> -->
 
-    <plugin filename="gz-sim-joint-position-controller-system"
+    <!-- <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>tendon_left</joint_name>
       <topic>/tendon_left/cmd_pos</topic>
-      <p_gain>50</p_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
       <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <d_gain>0.1</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
-    </plugin>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
+    </plugin> -->
 
-    <plugin filename="gz-sim-joint-position-controller-system"
+    <!-- <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>tendon_right</joint_name>
       <topic>/tendon_right/cmd_pos</topic>
-      <p_gain>50</p_gain>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
       <i_gain>0</i_gain>
-      <d_gain>5</d_gain>
+      <d_gain>0.1</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
-      <cmd_max>1.57</cmd_max>
-      <cmd_min>-1.57</cmd_min>
-    </plugin>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
+    </plugin> -->
   
-    <joint name="arm_base_joint" type="fixed">
-      <pose relative_to="base_link">0 0 -0.05 0 0 0</pose>
-      <parent>base_link</parent>
-      <child>arm_base_link</child>
-    </joint>
-
   </model>
 
 </sdf>
