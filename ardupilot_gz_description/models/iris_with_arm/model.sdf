@@ -404,7 +404,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/shoulder.stl</uri>
+            <uri>model://iris_with_arm/meshes/shoulder.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -458,7 +458,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/humerus.stl</uri>
+            <uri>model://iris_with_arm/meshes/humerus.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -512,7 +512,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/forearm.stl</uri>
+            <uri>model://iris_with_arm/meshes/forearm.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -566,7 +566,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/wrist.stl</uri>
+            <uri>model://iris_with_arm/meshes/wrist.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -620,7 +620,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/hand.stl</uri>
+            <uri>model://iris_with_arm/meshes/hand.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -723,7 +723,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/carpal-left.stl</uri>
+            <uri>model://iris_with_arm/meshes/carpal-left.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -777,7 +777,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/finger.stl</uri>
+            <uri>model://iris_with_arm/meshes/finger.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -827,7 +827,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/carpal-right.stl</uri>
+            <uri>model://iris_with_arm/meshes/carpal-right.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -881,7 +881,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/finger.stl</uri>
+            <uri>model://iris_with_arm/meshes/finger.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -931,7 +931,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/tendon.stl</uri>
+            <uri>model://iris_with_arm/meshes/tendon.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -981,7 +981,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/tendon.stl</uri>
+            <uri>model://iris_with_arm/meshes/tendon.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -1032,7 +1032,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/tendon.stl</uri>
+            <uri>model://iris_with_arm/meshes/tendon.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -1082,7 +1082,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>meshes/tendon.stl</uri>
+            <uri>model://iris_with_arm/meshes/tendon.stl</uri>
           </mesh>
         </geometry>
         <material>
