@@ -738,10 +738,10 @@
       <parent>hand_link</parent>
       <child>grip_left_link</child>
       <axis>
-        <xyz>-1 0 0</xyz>
+        <xyz>1 0 0</xyz>
         <limit>
-          <lower>-1.57</lower>
-          <upper>0</upper>
+          <lower>0</lower>
+          <upper>1.57</upper>
         </limit>
         <dynamics>
           <damping>0.01</damping>
@@ -793,17 +793,6 @@
       <child>finger_left_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <!-- <mimic joint="grip_left">
-          <multiplier>-1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic> -->
-        <limit>
-          <!-- <lower>-1.57</lower>
-          <upper>0</upper> -->
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
         <dynamics>
           <damping>0.01</damping>
         </dynamics>
@@ -854,11 +843,6 @@
       <child>grip_right_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <!-- <mimic joint="grip_left">
-          <multiplier>-1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic> -->
         <limit>
           <lower>0</lower>
           <upper>1.57</upper>
@@ -912,18 +896,7 @@
       <parent>grip_right_link</parent>
       <child>finger_right_link</child>
       <axis>
-        <xyz>-1 0 0</xyz>
-        <!-- <mimic joint="grip_left">
-          <multiplier>1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic> -->
-        <limit>
-          <!-- <lower>0</lower>
-          <upper>1.57</upper> -->
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
+        <xyz>1 0 0</xyz>
         <dynamics>
           <damping>0.01</damping>
         </dynamics>
@@ -973,18 +946,7 @@
       <parent>hand_link</parent>
       <child>tendon_left_link</child>
       <axis>
-        <xyz>-1 0 0</xyz>
-        <!-- <mimic joint="grip_left">
-          <multiplier>1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic> -->
-        <limit>
-          <!-- <lower>-1.57</lower>
-          <upper>0</upper> -->
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
+        <xyz>1 0 0</xyz>
         <dynamics>
           <damping>0.01</damping>
         </dynamics>
@@ -1035,22 +997,135 @@
       <child>tendon_right_link</child>
       <axis>
         <xyz>-1 0 0</xyz>
-        <!-- <mimic joint="grip_left">
-          <multiplier>-1</multiplier>
-          <offset>0</offset>
-          <reference>0</reference>
-        </mimic> -->
-        <limit>
-          <!-- <lower>0</lower>
-          <upper>1.57</upper> -->
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
         <dynamics>
           <damping>0.01</damping>
         </dynamics>
       </axis>
     </joint>
+
+    <!-- Links and detachable joint plugins to close kinematic chains in gripper -->
+    <!-- <link name="tendon_right_link_2">
+      <self_collide>0</self_collide>
+      <pose relative_to="tendon_right_2">0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <collision name="tendon_right_link_2_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="tendon_right_link_2_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/tendon.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
+      </visual>
+    </link>
+    <joint name="tendon_right_2" type="revolute">
+      <pose relative_to="hand_link">0 -0.034 0.05 1.57 0 0</pose>
+      <parent>finger_right_link</parent>
+      <child>tendon_right_link_2</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <link name="tendon_left_link_2">
+      <self_collide>0</self_collide>
+      <pose relative_to="tendon_left_2">0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <collision name="tendon_left_link_2_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="tendon_left_link_2_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>meshes/tendon.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1</ambient>
+          <diffuse>0.1 0.1 0.1</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+        </material>
+      </visual>
+    </link>
+    <joint name="tendon_left_2" type="revolute">
+      <pose relative_to="hand_link">0 0.034 0.05 -1.57 0 0</pose>
+      <parent>finger_left_link</parent>
+      <child>tendon_left_link_2</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <plugin name="gz::sim::systems::DetachableJoint"
+      filename="libgz-sim-detachable-joint-system.so">
+      <parent_link>tendon_left_link</parent_link>
+      <child_link>tendon_left_link_2</child_link>
+      <child_model>iris_with_arm</child_model>
+      <joint_type>fixed</joint_type>
+      <physics>
+        <cfm>1.0e-5</cfm>
+        <erp>0.8</erp>
+      </physics>
+    </plugin>
+    <plugin name="gz::sim::systems::DetachableJoint"
+      filename="libgz-sim-detachable-joint-system.so">
+      <parent_link>tendon_right_link</parent_link>
+      <child_link>tendon_right_link_2</child_link>
+      <child_model>iris_with_arm</child_model>
+      <joint_type>fixed</joint_type>
+      <physics>
+        <cfm>1.0e-5</cfm>
+        <erp>0.8</erp>
+      </physics>
+    </plugin> -->
 
     <plugin filename="gz-sim-joint-state-publisher-system"
       name="gz::sim::systems::JointStatePublisher">
@@ -1129,7 +1204,7 @@
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>grip_left</joint_name>
-      <topic>/grip_left/cmd_pos</topic>
+      <topic>/grip/cmd_pos</topic>
       <initial_position>0.0</initial_position>
       <p_gain>1</p_gain>
       <i_gain>0.0</i_gain>
@@ -1139,25 +1214,25 @@
       <cmd_max>1000</cmd_max>
       <cmd_min>-1000</cmd_min>
     </plugin>
-
-    <!-- <plugin filename="gz-sim-joint-position-controller-system"
-        name="gz::sim::systems::JointPositionController">
-      <joint_name>finger_left</joint_name>
-      <topic>/finger_left/cmd_pos</topic>
-      <initial_position>0.0</initial_position>
-      <p_gain>1</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>0.1</d_gain>
-      <i_max>1</i_max>
-      <i_min>-1</i_min>
-      <cmd_max>1000</cmd_max>
-      <cmd_min>-1000</cmd_min>
-    </plugin> -->
 
     <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>grip_right</joint_name>
-      <topic>/grip_right/cmd_pos</topic>
+      <topic>/grip/cmd_pos</topic>
+      <initial_position>0.0</initial_position>
+      <p_gain>1</p_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
+      <i_max>1</i_max>
+      <i_min>-1</i_min>
+      <cmd_max>1000</cmd_max>
+      <cmd_min>-1000</cmd_min>
+    </plugin>
+  
+    <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+      <joint_name>finger_left</joint_name>
+      <topic>/grip/cmd_pos</topic>
       <initial_position>0.0</initial_position>
       <p_gain>1</p_gain>
       <i_gain>0.0</i_gain>
@@ -1168,48 +1243,48 @@
       <cmd_min>-1000</cmd_min>
     </plugin>
 
-    <!-- <plugin filename="gz-sim-joint-position-controller-system"
+    <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>finger_right</joint_name>
-      <topic>/finger_right/cmd_pos</topic>
+      <topic>/grip/cmd_pos</topic>
       <initial_position>0.0</initial_position>
       <p_gain>1</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>0.1</d_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
       <cmd_max>1000</cmd_max>
       <cmd_min>-1000</cmd_min>
-    </plugin> -->
+    </plugin>
 
-    <!-- <plugin filename="gz-sim-joint-position-controller-system"
+    <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>tendon_left</joint_name>
-      <topic>/tendon_left/cmd_pos</topic>
+      <topic>/grip/cmd_pos</topic>
       <initial_position>0.0</initial_position>
       <p_gain>1</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>0.1</d_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
       <cmd_max>1000</cmd_max>
       <cmd_min>-1000</cmd_min>
-    </plugin> -->
+    </plugin>
 
-    <!-- <plugin filename="gz-sim-joint-position-controller-system"
+    <plugin filename="gz-sim-joint-position-controller-system"
         name="gz::sim::systems::JointPositionController">
       <joint_name>tendon_right</joint_name>
-      <topic>/tendon_right/cmd_pos</topic>
+      <topic>/grip/cmd_pos</topic>
       <initial_position>0.0</initial_position>
       <p_gain>1</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>0.1</d_gain>
+      <i_gain>0.0</i_gain>
+      <d_gain>0.01</d_gain>
       <i_max>1</i_max>
       <i_min>-1</i_min>
       <cmd_max>1000</cmd_max>
       <cmd_min>-1000</cmd_min>
-    </plugin> -->
-  
+    </plugin>
+
   </model>
 
 </sdf>
