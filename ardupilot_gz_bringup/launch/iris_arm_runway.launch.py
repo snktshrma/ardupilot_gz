@@ -30,7 +30,6 @@
 # limitations under the License.
 
 """Launch an iris quadcopter with arm in Gazebo and Rviz."""
-import os
 from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
@@ -38,7 +37,6 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-from launch.actions import SetEnvironmentVariable
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -54,13 +52,8 @@ def generate_launch_description():
     pkg_project_gazebo = get_package_share_directory("ardupilot_gz_gazebo")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
     
-    if "GZ_SIM_RESOURCE_PATH" in os.environ:
-        gz_sim_resource_path = os.environ["GZ_SIM_RESOURCE_PATH"]
-    else:
-        gz_sim_resource_path = ""
-
     # Iris.
-    iris = IncludeLaunchDescription(
+    robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 PathJoinSubstitution(
@@ -73,15 +66,7 @@ def generate_launch_description():
                 ),
             ]
         ),
-        launch_arguments={
-            "model": "iris_with_arm",
-            "name": "iris",
-            "x": "0",
-            "y": "0",
-            "z": "0.194923",
-            "R": "0.0",
-            "P": "0.0",
-        }.items(),
+        condition=IfCondition(LaunchConfiguration("spawn_robot")),
     )
 
     # Gazebo.
@@ -91,8 +76,9 @@ def generate_launch_description():
         ),
         launch_arguments={
             "gz_args": "-v4 -s -r "
-            + f'{Path(pkg_project_gazebo) / "worlds" / "iris_maze.sdf"}'
+            + f'{Path(pkg_project_gazebo) / "worlds" / "runway.sdf"}'
         }.items(),
+        condition=IfCondition(LaunchConfiguration("use_gz_sim_server")),
     )
 
     gz_sim_gui = IncludeLaunchDescription(
@@ -100,6 +86,7 @@ def generate_launch_description():
             f'{Path(pkg_ros_gz_sim) / "launch" / "gz_sim.launch.py"}'
         ),
         launch_arguments={"gz_args": "-v4 -g"}.items(),
+        condition=IfCondition(LaunchConfiguration("use_gz_sim_gui")),
     )
 
     # RViz.
@@ -115,13 +102,27 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", gz_sim_resource_path),
+            DeclareLaunchArgument(
+                "use_gz_sim_server",
+                default_value="true",
+                description="Run the Gazebo server.",
+            ),
+            DeclareLaunchArgument(
+                "use_gz_sim_gui",
+                default_value="true",
+                description="Run the Gazebo GUI.",
+            ),
+            DeclareLaunchArgument(
+                "spawn_robot",
+                default_value="true",
+                description="Spawn the robot and start SITL+ROS.",
+            ),
             DeclareLaunchArgument(
                 "rviz", default_value="true", description="Open RViz."
             ),
             gz_sim_server,
             gz_sim_gui,
-            iris,
+            robot,
             rviz,
         ]
     )
