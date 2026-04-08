@@ -9,7 +9,9 @@ install(DIRECTORY rviz/   DESTINATION share/${PROJECT_NAME}/rviz)
 install(DIRECTORY srdf/   DESTINATION share/${PROJECT_NAME}/srdf)
 install(DIRECTORY urdf/   DESTINATION share/${PROJECT_NAME}/urdf)
 
-install(PROGRAMS scripts/moveit_to_gz_bridge.py
+install(PROGRAMS
+  scripts/moveit_to_gz_bridge.py
+  scripts/color_pick_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

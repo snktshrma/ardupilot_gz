@@ -3,7 +3,7 @@
 <package format="3">
   <name>ardupilot_gz_arm_moveit</name>
   <version>0.0.0</version>
-  <description>MoveIt configuration and launch files for the iris_with_arm model.</description>
+  <description>MoveIt configuration and launch files for iris_with_arm.</description>
   <maintainer email="sharma.sanket272@gmail.com">Sanket Sharma</maintainer>
   <license>GPL-3.0</license>
 
@@ -21,11 +21,17 @@
   <exec_depend>moveit_ros_visualization</exec_depend>
   <exec_depend>rviz2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
   <exec_depend>sdformat_urdf</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>control_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>moveit_msgs</exec_depend>
+  <exec_depend>shape_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
 
   <!-- Data dependencies -->
   <exec_depend>ardupilot_gz_description</exec_depend>
