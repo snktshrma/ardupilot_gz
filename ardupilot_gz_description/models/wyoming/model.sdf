@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+    <model name="wyoming">
+      <static>true</static>
+      <pose>14.85 -14.79 -6.56 0 0 0</pose>
+
+      <link name="ground">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>model://wyoming/textures/wyoming_height_map.tif</uri>
+              <size>742.3 739.27 8.0</size>
+              <pos>14.85 -14.79  -6.56</pos>
+            </heightmap>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="ground_visual">
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
+              <texture>
+                <diffuse>model://wyoming/textures/wyoming_aerial.png</diffuse>
+                <normal>model://wyoming/textures/wyoming_aerial.png</normal>
+                <size>742.3 739.27 8.0</size>
+              </texture>
+              <uri>model://wyoming/textures/wyoming_height_map.tif</uri>
+              <size>742.3 739.27 8.0</size>
+              <pos>14.85 -14.79 -6.56</pos>
+              <sampling>2</sampling>
+
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+
+
+        
+        
+
+    </model>
+</sdf>
