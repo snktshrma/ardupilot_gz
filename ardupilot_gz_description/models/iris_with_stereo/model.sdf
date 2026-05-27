@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version="1.9">
 
-  <model name="iris_with_rgbd">
+  <model name="iris_with_stereo">
     <include merge="true">
       <uri>model://iris_with_standoffs</uri>
     </include>
@@ -285,7 +285,7 @@
 
 
     <include merge="true">
-      <uri>model://rgbd_cam</uri>
+      <uri>model://stereo_cam</uri>
       <name>camera_link</name>
       <pose>0.045 0 0.07 0 0 0</pose>    
     </include>

@@ -61,7 +61,7 @@ def generate_launch_description():
                         pkg_project_bringup,
                         "launch",
                         "robots",
-                        "iris_rgbd.launch.py",
+                        "iris_stereo.launch.py",
                     ]
                 ),
             ]
