@@ -61,7 +61,7 @@
           </image>
           <clip>
             <near>0.01</near>
-            <far>10.0</far>
+            <far>100.0</far>
           </clip>
         </camera>
         <always_on>1</always_on>
@@ -81,7 +81,7 @@
           </image>
           <clip>
             <near>0.01</near>
-            <far>10.0</far>
+            <far>100.0</far>
           </clip>
         </camera>
         <always_on>1</always_on>
