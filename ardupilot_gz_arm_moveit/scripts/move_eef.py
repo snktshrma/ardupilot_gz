@@ -7,12 +7,17 @@ import time
 from dataclasses import dataclass
 from typing import NamedTuple, Optional, Tuple
 
+import cv2
+import numpy as np
 import rclpy
+from cv_bridge import CvBridge
 from rclpy.action import ActionClient
 from rclpy.duration import Duration
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from rclpy.utilities import remove_ros_args
 import tf2_ros
+import tf_transformations
 from tf2_ros import TransformException
 from geometry_msgs.msg import Pose, PoseStamped, Vector3
 from moveit_msgs.action import MoveGroup
@@ -20,6 +25,7 @@ from moveit_msgs.msg import (
     Constraints, JointConstraint, MotionPlanRequest, MoveItErrorCodes,
     OrientationConstraint, PlanningOptions, PositionConstraint,
 )
+from sensor_msgs.msg import CameraInfo, Image
 from shape_msgs.msg import SolidPrimitive
 
 BASE_FRAME, EEF_LINK = "base_link", "End_Effector"
@@ -36,6 +42,26 @@ ROS_PARAMS = {
     "gripper_group": GRIPPER_GROUP, "gripper_joint": GRIPPER_JOINT,
     "move_group_action": MOVE_GROUP_ACTION,
     "gripper_open": GRIPPER_OPEN, "gripper_close": GRIPPER_CLOSE,
+}
+
+COLOR_PICK_PARAMS = {
+    "image_topic": "/camera/image_raw",
+    "camera_info_topic": "/camera/camera_info",
+    "optical_frame": "camera_optical_frame",
+    "table_z_in_base": 0.0,
+    "approach_z_offset": 0.05,
+    "hsv_lower": [40, 40, 40],
+    "hsv_upper": [90, 255, 255],
+    "min_area_px": 400,
+    "single_shot": True,
+    "enable_gripper_close": True,
+    "enable_place": False,
+    "place_x": 0.0,
+    "place_y": 0.0,
+    "place_z": 0.12,
+    "place_approach_z_offset": 0.05,
+    "pos_tol": 0.02,
+    "position_only": True,
 }
 
 Quat = Tuple[float, float, float, float]
@@ -134,8 +160,33 @@ def verify_eef(target_xyz, target_q, current: Pose7, position_only, ee_pos_tol, 
     return EefVerifyResult(pos_err, ori_err, False, RuntimeError(", ".join(parts)))
 
 
-class MoveEef(Node):
+def pixel_to_base_point(u, v, k, tf_buffer, base_frame, optical_frame, table_z):
+    fx, fy, cx, cy = k[0], k[4], k[2], k[5]
+    x = (u - cx) / fx
+    y = (v - cy) / fy
+    norm = math.sqrt(x * x + y * y + 1.0)
+    d_opt = (x / norm, y / norm, 1.0 / norm)
 
+    tfm = tf_buffer.lookup_transform(
+        base_frame, optical_frame, rclpy.time.Time(), timeout=Duration(seconds=0.5),
+    )
+    tr = tfm.transform.translation
+    q = tfm.transform.rotation
+    rot = tf_transformations.quaternion_matrix([q.x, q.y, q.z, q.w])[:3, :3]
+    origin = (tr.x, tr.y, tr.z)
+    direction = tuple(
+        rot[i][0] * d_opt[0] + rot[i][1] * d_opt[1] + rot[i][2] * d_opt[2]
+        for i in range(3)
+    )
+    if abs(direction[2]) < 1e-6:
+        return None
+    t_hit = (table_z - origin[2]) / direction[2]
+    if t_hit < 0:
+        return None
+    return tuple(origin[i] + t_hit * direction[i] for i in range(3))
+
+
+class MoveEef(Node):
     def __init__(self):
         super().__init__("move_eef")
         for name, default in ROS_PARAMS.items():
@@ -245,32 +296,197 @@ class MoveEef(Node):
         self.send_goal(gripper_goal(self.gripper_joint, val, self.gripper_group, plan_only))
 
 
-def _default_params_file():
+class ColorPickNode(MoveEef):
+
+    def __init__(self):
+        super().__init__()
+        for name, default in COLOR_PICK_PARAMS.items():
+            self.declare_parameter(name, default)
+        self.image_topic = self.get_parameter("image_topic").value
+        self.camera_info_topic = self.get_parameter("camera_info_topic").value
+        self.optical_frame = self.get_parameter("optical_frame").value
+        self.table_z = self.get_parameter("table_z_in_base").value
+        self.approach_z = self.get_parameter("approach_z_offset").value
+        self.min_area = self.get_parameter("min_area_px").value
+        self.single_shot = self.get_parameter("single_shot").value
+        self.enable_gripper_close = self.get_parameter("enable_gripper_close").value
+        self.enable_place = self.get_parameter("enable_place").value
+        self.place_x = self.get_parameter("place_x").value
+        self.place_y = self.get_parameter("place_y").value
+        self.place_z = self.get_parameter("place_z").value
+        self.place_approach_z = self.get_parameter("place_approach_z_offset").value
+        self.pick_pos_tol = self.get_parameter("pos_tol").value
+        self.pick_position_only = self.get_parameter("position_only").value
+        lo = list(self.get_parameter("hsv_lower").value)
+        hi = list(self.get_parameter("hsv_upper").value)
+        self.hsv_lo = np.array(lo, dtype=np.uint8)
+        self.hsv_hi = np.array(hi, dtype=np.uint8)
+
+        self._done = False
+        self._busy = False
+        self._bridge = CvBridge()
+        self._k = None
+        self._phase = "pick"
+
+        self.pub_dbg = self.create_publisher(PoseStamped, "debug/grasp_pose", 10)
+        self.create_subscription(CameraInfo, self.camera_info_topic, self._on_camera_info, 1)
+        self.create_subscription(Image, self.image_topic, self._on_image, 1)
+        self.get_logger().info(
+            f"color_pick: image={self.image_topic}, optical_frame={self.optical_frame}, "
+            f"base_frame={self.base_frame}, table_z={self.table_z}"
+        )
+
+    def _on_camera_info(self, msg: CameraInfo):
+        self._k = list(msg.k)
+
+    def _on_image(self, msg: Image):
+        if self._busy or (self.single_shot and self._done):
+            return
+        if self._k is None or not self._client.server_is_ready():
+            return
+
+        bgr = self._bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, self.hsv_lo, self.hsv_hi)
+        mask = cv2.erode(mask, None, iterations=1)
+        mask = cv2.dilate(mask, None, iterations=2)
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not cnts:
+            return
+        contour = max(cnts, key=cv2.contourArea)
+        if cv2.contourArea(contour) < self.min_area:
+            return
+        moments = cv2.moments(contour)
+        if moments["m00"] < 1e-6:
+            return
+        u = moments["m10"] / moments["m00"]
+        v = moments["m01"] / moments["m00"]
+
+        try:
+            hit = pixel_to_base_point(
+                u, v, self._k, self._tf_buffer,
+                self.base_frame, self.optical_frame, self.table_z,
+            )
+        except TransformException as exc:
+            self.get_logger().warn(f"TF {self.base_frame}->{self.optical_frame}: {exc}")
+            return
+        if hit is None:
+            return
+
+        z = hit[2] + self.approach_z
+        pose = self.make_pose(hit[0], hit[1], z, None)
+        self.pub_dbg.publish(pose)
+        self.get_logger().info(
+            f"Pick target in {self.base_frame}: ({hit[0]:.3f}, {hit[1]:.3f}, {z:.3f}) "
+            f"from pixel ({u:.0f}, {v:.0f})"
+        )
+        goal = pose_goal(
+            pose, self.eef_link, self.arm_group, self.pick_pos_tol, 0.4,
+            self.pick_position_only, False,
+        )
+        self._busy = True
+        self._phase = "pick"
+        self._client.send_goal_async(goal).add_done_callback(self._on_arm_goal_sent)
+
+    def _on_arm_goal_sent(self, future):
+        handle = future.result()
+        if not handle.accepted:
+            self.get_logger().warn("Pick move goal rejected")
+            self._busy = False
+            return
+        handle.get_result_async().add_done_callback(self._on_arm_result)
+
+    def _on_arm_result(self, future):
+        res = future.result().result
+        if res.error_code.val != MoveItErrorCodes.SUCCESS:
+            self.get_logger().warn(f"Arm move failed (error {res.error_code.val})")
+            self._busy = False
+            return
+        if self._phase == "place":
+            self.get_logger().info("Place reached, opening gripper")
+            self._send_gripper(True)
+            return
+        if self.enable_gripper_close:
+            self.get_logger().info("Pick reached, closing gripper")
+            self._send_gripper(False)
+        elif self.enable_place:
+            self._start_place()
+        else:
+            self._finish()
+
+    def _send_gripper(self, open_gripper: bool):
+        val = self.gripper_open if open_gripper else self.gripper_close
+        label = "open" if open_gripper else "close"
+        self.get_logger().info(f"Gripper {label}: {val:.3f}")
+        goal = gripper_goal(self.gripper_joint, val, self.gripper_group, False)
+        self._client.send_goal_async(goal).add_done_callback(self._on_gripper_goal_sent)
+
+    def _on_gripper_goal_sent(self, future):
+        handle = future.result()
+        if not handle.accepted:
+            self.get_logger().warn("Gripper goal rejected")
+            self._busy = False
+            return
+        handle.get_result_async().add_done_callback(self._on_gripper_result)
+
+    def _on_gripper_result(self, future):
+        res = future.result().result
+        if res.error_code.val != MoveItErrorCodes.SUCCESS:
+            self.get_logger().warn(f"Gripper move failed (error {res.error_code.val})")
+            self._busy = False
+            return
+        if self._phase == "pick" and self.enable_place:
+            self._start_place()
+        else:
+            self._finish()
+
+    def _start_place(self):
+        self._phase = "place"
+        z = self.place_z + self.place_approach_z
+        pose = self.make_pose(self.place_x, self.place_y, z, None)
+        self.pub_dbg.publish(pose)
+        self.get_logger().info(
+            f"Place target in {self.base_frame}: ({self.place_x:.3f}, {self.place_y:.3f}, {z:.3f})"
+        )
+        goal = pose_goal(
+            pose, self.eef_link, self.arm_group, self.pick_pos_tol, 0.4,
+            self.pick_position_only, False,
+        )
+        self._client.send_goal_async(goal).add_done_callback(self._on_arm_goal_sent)
+
+    def _finish(self):
+        self._done = True
+        self._busy = False
+        self.get_logger().info("Color pick/place done")
+
+
+def _default_params_file(color_pick=False):
     try:
         from ament_index_python.packages import get_package_share_directory
-        path = os.path.join(
-            get_package_share_directory("so_arm_100_bringup"), "config", "move_eef.yaml"
-        )
+        name = "move_eef_color_pick.yaml" if color_pick else "move_eef.yaml"
+        path = os.path.join(get_package_share_directory("so_arm_100_bringup"), "config", name)
         return path if os.path.isfile(path) else None
     except Exception:
         return None
 
 
 def _cli_argv(raw_argv):
-    """Application args only (after '--'), with a clear error if a yaml path was passed as X."""
     argv = remove_ros_args(raw_argv)[1:]
     if argv and argv[0].endswith((".yaml", ".yml")):
         sys.exit(2)
     return argv
 
 
-def parse_args(argv):
+def parse_args(argv, color_pick=False):
     p = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("x", type=float, help="Target x [m]")
-    p.add_argument("y", type=float, help="Target y [m]")
-    p.add_argument("z", type=float, help="Target z [m]")
+    p.add_argument("--color-pick", action="store_true",
+                   help="Camera HSV pick")
+    if not color_pick:
+        p.add_argument("x", type=float, help="Target x [m]")
+        p.add_argument("y", type=float, help="Target y [m]")
+        p.add_argument("z", type=float, help="Target z [m]")
     p.add_argument("--qx", type=float, default=None)
     p.add_argument("--qy", type=float, default=None)
     p.add_argument("--qz", type=float, default=None)
@@ -296,31 +512,20 @@ def resolve_quat(args):
     return vals, False
 
 
-def main(argv=None):
-    raw_argv = sys.argv if argv is None else [sys.argv[0], *argv]
-    init_argv = list(raw_argv)
-    params_file = _default_params_file()
-    if params_file and "--params-file" not in init_argv:
-        init_argv += ["--ros-args", "--params-file", params_file]
-
-    rclpy.init(args=init_argv)
-    cli_argv = _cli_argv(init_argv)
-    if not cli_argv:
-        print("move_eef -- -0.08 -0.22 0.10", file=sys.stderr)
-        rclpy.shutdown()
-        return 2
-
+def run_color_pick():
+    node = ColorPickNode()
+    executor = MultiThreadedExecutor(num_threads=4)
+    executor.add_node(node)
     try:
-        args = parse_args(cli_argv)
-        quat, position_only = resolve_quat(args)
-    except SystemExit as exc:
-        rclpy.shutdown()
-        return int(exc.code) if exc.code is not None else 2
-    except ValueError as exc:
-        print(exc, file=sys.stderr)
-        rclpy.shutdown()
-        return 2
+        executor.spin()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
 
+
+def run_move_cli(args):
+    quat, position_only = resolve_quat(args)
     node = MoveEef()
     cfg = MovePoseConfig.from_args(args, quat, position_only)
     try:
@@ -336,9 +541,45 @@ def main(argv=None):
         return 1
     finally:
         node.destroy_node()
+    return 0
+
+
+def main(argv=None):
+    raw_argv = sys.argv if argv is None else [sys.argv[0], *argv]
+    cli_argv = _cli_argv(list(raw_argv))
+    color_pick = "--color-pick" in cli_argv
+
+    init_argv = list(raw_argv)
+    params_file = _default_params_file(color_pick) or _default_params_file(False)
+    if params_file and "--params-file" not in init_argv:
+        init_argv += ["--ros-args", "--params-file", params_file]
+
+    rclpy.init(args=init_argv)
+
+    if color_pick:
+        try:
+            run_color_pick()
+        finally:
+            if rclpy.ok():
+                rclpy.shutdown()
+        return 0
+
+    if not cli_argv:
+        print("move_eef -- X Y Z   or   move_eef -- --color-pick", file=sys.stderr)
+        rclpy.shutdown()
+        return 2
+
+    try:
+        args = parse_args(cli_argv, color_pick=False)
+    except SystemExit as exc:
+        rclpy.shutdown()
+        return int(exc.code) if exc.code is not None else 2
+
+    try:
+        return run_move_cli(args)
+    finally:
         if rclpy.ok():
             rclpy.shutdown()
-    return 0
 
 
 if __name__ == "__main__":
